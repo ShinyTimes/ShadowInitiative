@@ -1,0 +1,25 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+a {
+  color: #00B7FF;
+}
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+li {
+  border: solid 1px black;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px 0;
+}
+.delete-btn {
+  color: red;
+  font-weight: 700;
+}
+#activeRunner {
+  display: flex;
+}

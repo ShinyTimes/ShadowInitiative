@@ -1,0 +1,73 @@
+﻿extends layout
+
+block content
+    h1(id='title') Runner Initiatives
+    button(id='rollAll' onclick='rollAll()') Roll all initiatives
+    button(id='newPass' onclick='newPass()') New Pass
+    h2(id='info')
+    input(type='checkbox')
+    div
+        span Name:
+        input(
+            id='name'
+            name='name'
+            type='text'
+        )
+        span Dice:
+        input(
+            id='dice'
+            name='dice'
+            type='number'
+            value=1
+        )
+        span Base Init:
+        input(
+            id='baseInit'
+            name='baseInit'
+            type='number'
+            value=1
+        )
+        button(
+        id='runnersubmit'
+        ) add runner
+    div Selected Runner:
+        button(
+        id='dodge'
+        ) Dodge
+
+        button(
+        id='parry'
+        ) Parry
+
+        button(
+        id='block'
+        ) Block
+
+        button(
+        id='fullDefense'
+        ) FullDefense
+        
+        button(
+        id='intercept'
+        ) Intercept
+
+
+    div
+        ul(
+            id='activeRunners'
+            )
+    script(src='/javascripts/runnersscript.js')
+
+//-   ul
+        each runner in htmlRes
+            li(
+            id= runner._id)
+                div= 'Name: ' + runner.name
+                div= 'Dice: ' + runner.dice
+                div(class='roll')
+                button(
+                onclick='roll(' + runner.dice + ', "' + runner._id + '")'
+                ) Roll
+                button(
+                onclick='deleteRunner("' + runner._id + '")'
+                ) X               
