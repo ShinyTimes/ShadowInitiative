@@ -43,6 +43,7 @@
     <Compile Include="server.js" />
     <Content Include="bin\www" />
     <Content Include="package.json" />
+    <Content Include="public\images\shadowrun.jpg" />
     <Content Include="public\stylesheets\style.less" />
     <Content Include="README.md" />
     <Content Include="views\error.pug" />

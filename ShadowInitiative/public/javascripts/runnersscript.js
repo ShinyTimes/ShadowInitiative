@@ -7,6 +7,8 @@ var appJ = "application/json";
 var activeRunners = null;
 var passCount = -1;
 var selectedRunner = -1;
+var turnCount = -1;
+var excludedCount = 0;
 
 //
 // Functionality
@@ -15,9 +17,13 @@ function sortByInit()
 {
     activeRunners.sort(function (a, b)
     {
-        if (b.excluded || a.currentInit > b.currentInit)
+        if (a.excluded)
+            return 1;
+        else if (b.excluded)
             return -1;
-        else if (a.excluded || a.currentInit < b.currentInit)
+        else if (a.currentInit > b.currentInit)
+            return -1;
+        else if (a.currentInit < b.currentInit)
             return 1;
         else if (a.currentInit === b.currentInit)
         {
@@ -66,7 +72,14 @@ function rollAll()
             roll(i);
     }
     sortByInit();
+    $('#' + turnCount).removeClass("currentTurn");
+    turnCount = 0;
+
     uiUpdateRunners();
+
+    // Turn func
+  
+   // $('#' + turnCount).addClass("currentTurn");
 }
 
 function subtractInitiative(index, amount)
@@ -96,8 +109,44 @@ function newPass()
         // Subtracts 10 initative per pass
         subtractInitiative(i, 10);
     }
+    if (activeRunners[0].currentInit > 0)
+        turnCount = 0;
+    else
+        turnCount = -1;
 
     uiUpdateRunners();
+}
+
+
+function nextTurn()
+{
+    turnCount++;
+    if (turnCount > 0 && turnCount < activeRunners.length - excludedCount)
+    {
+        // The next one
+        var runner = activeRunners[turnCount];
+        // is the next one more than 0 initiative or not exlcuded then 
+        if (runner.currentInit > 0 && !runner.excluded)
+        {
+            // show next
+            $('#' + turnCount).addClass("currentTurn");
+            $('#' + (turnCount - 1)).removeClass("currentTurn");
+        }
+        else
+        {
+            // wrap around and show next
+            $('#' + (turnCount - 1)).removeClass("currentTurn");
+            newPass();
+        }
+    }
+    else if (turnCount >= activeRunners.length - excludedCount)
+    {
+        // wrap around and show next
+        $('#' + (turnCount - 1)).removeClass("currentTurn");
+        newPass();
+    }
+
+    
 }
 
 //
@@ -114,19 +163,23 @@ function uiAddRunner(index, runner)
         + '<div>Exclude: <input type="checkbox" >'
         + '</div >' 
         + '<div class="roll"></div>'
-        + '<button onclick="rollWithUpdate(' + index + ')">'
+        + '<button class="good" onclick="rollWithUpdate(' + index + ')">'
         //+ '<button onclick="roll(\'' + runner._id + '\')">'
         + 'Roll</button>'
-        + '<button onclick=\'deleteRunner(' + index + ')\'>'
+        + '<button class="bad" onclick=\'deleteRunner(' + index + ')\'>'
         + 'X</button>'
         + '</li>');
-
-    if (!runner.excluded && passCount > -1)
+    if (runner.excluded)
     {
+        $('#' + index).addClass("excluded");
+    }
+    else if (passCount > -1)//!runner.excluded && 
+    {
+        $('#' + index).removeClass("excluded");
         $('#' + index + ' .roll').html("Initiative: " + runner.currentInit);
 
         if (runner.currentInit === 0)
-            $("#" + index).css("border", "red dotted");
+            $("#" + index).addClass("outOfPasses")//.css("border", "red dotted");
     }
 
     $("#" + index + " :checkbox").prop("checked", runner.excluded);
@@ -181,6 +234,8 @@ function uiUpdateRunners()
     {
         uiAddRunner(index, runner);
     });
+    if (turnCount > -1)
+        $('#' + turnCount).addClass("currentTurn");
     addExclusionListeners();
     addCoolness();
     addQuickhandSubtractListener();
@@ -242,16 +297,26 @@ function addExclusionListeners()
         if ($(this).is(':checked'))
         {
             activeRunners[index].excluded = true;
+            excludedCount++;
+
+            if (turnCount > index)
+                turnCount--;
+
         } else
         {
             activeRunners[index].excluded = false;
+            excludedCount--;
+
+            if (turnCount < index)
+                turnCount++;
         }
 
-        if (passCount > -1)
-        {
+        //if (passCount > -1)
+        //{
+            sortByInit();
             uiUpdateRunners();
             console.log("Also updates ui");
-        }
+        //}
     });
 }
 
@@ -284,15 +349,15 @@ function addCoolness()
 
         if (lastSelected === selectedRunner)
         {
-            $("#" + lastSelected).css("background", "");
+            $("#" + lastSelected).removeClass("selected")//.css("background", "");
             selectedRunner = -1;
         }
         else
         {
-            $("#" + selectedRunner).css("background", "peachpuff");
+            $("#" + selectedRunner).addClass("selected")//.css("background", "peachpuff");
             if (lastSelected > -1)
             {
-                $("#" + lastSelected).css("background", "");
+                $("#" + lastSelected).removeClass("selected") //.css("background", "");
             }
         }
     });
@@ -326,6 +391,7 @@ function addQuickhandSubtractListener()
     });
 
 }
+
 
 //Initial Run
 function initPage()

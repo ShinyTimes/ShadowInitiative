@@ -1,62 +1,80 @@
 ﻿extends layout
 
 block content
-    h1(id='title') Runner Initiatives
-    button(id='rollAll' onclick='rollAll()') Roll all initiatives
-    button(id='newPass' onclick='newPass()') New Pass
-    h2(id='info')
-    input(type='checkbox')
-    div
-        span Name:
-        input(
-            id='name'
-            name='name'
-            type='text'
-        )
-        span Dice:
-        input(
-            id='dice'
-            name='dice'
-            type='number'
-            value=1
-        )
-        span Base Init:
-        input(
-            id='baseInit'
-            name='baseInit'
-            type='number'
-            value=1
-        )
-        button(
-        id='runnersubmit'
-        ) add runner
-    div Selected Runner:
-        button(
-        id='dodge'
-        ) Dodge
 
-        button(
-        id='parry'
-        ) Parry
+    img(id='bg' src='../images/shadowrun.jpg')
+    div(id='content')
+        div(id='mainFunc')
+            h1(id='title') Runner Initiatives
+            button(id='rollAll' class='good' onclick='rollAll()') Roll all initiatives
+            button(id='newPass' class='bad' onclick='newPass()') New Pass
+            button(id='nextTurn' class='good' onclick='nextTurn()') Next Turn
 
-        button(
-        id='block'
-        ) Block
+        h2(id='info')
+        div(id='newRunner')
+            div
+                span Name:
+                input(
+                    id='name'
+                    name='name'
+                    type='text'
+                )
+            div
+                span Dice:
+                input(
+                    id='dice'
+                    name='dice'
+                    type='number'
+                    value=1
+                )
+            div
+                span Base Init:
+                input(
+                    id='baseInit'
+                    name='baseInit'
+                    type='number'
+                    value=1
+                )
+            
 
-        button(
-        id='fullDefense'
-        ) FullDefense
+            button(
+            id='runnersubmit'
+            class='good'
+            ) add runner
+
+        div(id='selectedRunner') 
+            h3 Highlighted Commands:
+            button(
+            id='dodge'
+            class='bad'
+            ) Dodge
+
+            button(
+            id='parry'
+            class='bad'
+            ) Parry
+
+            button(
+            id='block'
+            class='bad'
+            ) Block
+
+            button(
+            id='fullDefense'
+            class='bad'
+            ) Full Defense
         
-        button(
-        id='intercept'
-        ) Intercept
+            button(
+            id='intercept'
+            class='bad'
+            ) Intercept
 
 
-    div
-        ul(
-            id='activeRunners'
-            )
-    script(src='/javascripts/runnersscript.js')
+        div
+            ul(
+                id='activeRunners'
+                )
+        script(src='/javascripts/runnersscript.js')
 
 //-   ul
         each runner in htmlRes
