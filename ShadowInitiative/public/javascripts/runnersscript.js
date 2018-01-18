@@ -13,6 +13,40 @@ var excludedCount = 0;
 //
 // Functionality
 //
+function dealDamage(selectedRunner, damageDealt)
+{
+    var runner = activeRunners[selectedRunner];
+
+    for (var i = damageDealt; damageDealt > 0; damageDealt--)
+    {
+        runner.damageTaken++;
+
+        if (runner.damageTaken % 3 === 0)
+            runner.currentInit--;
+    }
+    uiUpdateRunners();
+}
+
+function healWounds(selectedRunner, woundsHealed)
+{
+    var runner = activeRunners[selectedRunner];
+
+    for (var i = woundsHealed; woundsHealed > 0; woundsHealed--)
+    {
+        if (runner.damageTaken > 0)
+        {
+            runner.damageTaken--;
+
+            if (runner.damageTaken % 3 === 0)
+                runner.currentInit++;
+        }
+        else
+            break;
+    }
+    uiUpdateRunners();
+}
+
+
 function sortByInit()
 {
     activeRunners.sort(function (a, b)
@@ -50,7 +84,7 @@ function roll(index)
     {
         value += Math.floor((Math.random() * 6) + 1);
     }
-    activeRunners[index].currentInit = value - (passCount * 10);
+    activeRunners[index].currentInit = value - (passCount * 10) - (activeRunners[index].damageTaken / 3);
 }
 
 function rollWithUpdate(index)
@@ -60,8 +94,6 @@ function rollWithUpdate(index)
     sortByInit();
     uiUpdateRunners();
 }
-
-
 
 function rollAll()
 {
@@ -145,8 +177,6 @@ function nextTurn()
         $('#' + (turnCount - 1)).removeClass("currentTurn");
         newPass();
     }
-
-    
 }
 
 //
@@ -160,11 +190,10 @@ function uiAddRunner(index, runner)
         + '<div>Name: ' + runner.name + '</div>'
         + '<div>Base Init: ' + runner.baseInit + '</div>'
         + '<div>Dice: ' + runner.dice + '</div>'
-        + '<div>Exclude: <input type="checkbox" >'
-        + '</div >' 
+        + '<div>Exclude: <input type="checkbox"></div >'
+        + '<div>Damage Taken: ' + runner.damageTaken + '</div>'
         + '<div class="roll"></div>'
         + '<button class="good" onclick="rollWithUpdate(' + index + ')">'
-        //+ '<button onclick="roll(\'' + runner._id + '\')">'
         + 'Roll</button>'
         + '<button class="bad" onclick=\'deleteRunner(' + index + ')\'>'
         + 'X</button>'
@@ -173,7 +202,7 @@ function uiAddRunner(index, runner)
     {
         $('#' + index).addClass("excluded");
     }
-    else if (passCount > -1)//!runner.excluded && 
+    else if (passCount > -1)
     {
         $('#' + index).removeClass("excluded");
         $('#' + index + ' .roll').html("Initiative: " + runner.currentInit);
@@ -208,8 +237,9 @@ function createRunner(name, dice, baseInit)
             success: function (data)
             {
                 runner._id = data;
+                runner.damageTaken = 0;
+                runner.currentInit = 0;
                 var index = activeRunners.push(runner) - 1;
-                console.log(index);
                 uiRunnerCreated(runner);
                 uiAddRunner(index, runner);
             }
@@ -257,6 +287,7 @@ function getRunners()
         {
             activeRunners[i].excluded = false;
             activeRunners[i].currentInit = 0;
+            activeRunners[i].damageTaken = 0;
         }
         uiUpdateRunners();
     });
@@ -322,22 +353,21 @@ function addExclusionListeners()
 
 function addSubmitListener()
 {
-     $("#runnersubmit").bind("click", function ()
-        {
-            var name = $("#name").val();
-            var dice = $("#dice").val();
-            var baseInit = $("#baseInit").val();
+    $("#runnersubmit").bind("click", function ()
+    {
+        var name = $("#name").val();
+        var dice = $("#dice").val();
+        var baseInit = $("#baseInit").val();
 
-            if ($.isNumeric(dice))
-                dice = parseInt(dice);
+        if ($.isNumeric(dice))
+            dice = parseInt(dice);
 
-            if ($.isNumeric(baseInit))
-                baseInit = parseInt(baseInit);
+        if ($.isNumeric(baseInit))
+            baseInit = parseInt(baseInit);
 
-            if (name != "" && dice > 0 && dice > 0)
-                createRunner(name, dice, baseInit);
-
-     });
+        if (name != "" && dice > 0 && dice > 0)
+            createRunner(name, dice, baseInit);
+    });
 }
 
 function addCoolness()
@@ -390,6 +420,25 @@ function addQuickhandSubtractListener()
         subtractInitiativeAndUpdate(selectedRunner, 5);
     });
 
+    $("#dealDamage").click(function ()
+    {
+        var damageDealt = $('#damageDealt').val();
+
+        if ($.isNumeric(damageDealt) && damageDealt !== 0)
+            damageDealt = parseInt(damageDealt);
+
+        dealDamage(selectedRunner, damageDealt);
+    });
+
+    $("#healWounds").click(function ()
+    {
+        var woundsHealed = $('#damageDealt').val();
+
+        if ($.isNumeric(woundsHealed) && woundsHealed !== 0)
+            woundsHealed = parseInt(woundsHealed);
+
+        healWounds(selectedRunner, woundsHealed);
+    });
 }
 
 
@@ -402,7 +451,3 @@ function initPage()
 }
 
 initPage();
-function seeRunners()
-{
-    console.log(activeRunners);
-}

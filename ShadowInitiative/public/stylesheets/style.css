@@ -182,7 +182,7 @@ button {
   justify-content: space-evenly;
   flex-wrap: wrap;
   min-width: 200px;
-  height: 200px;
+  height: 225px;
   padding: 0 15px;
 }
 #selectedRunner h3 {
@@ -192,6 +192,21 @@ button {
 }
 #selectedRunner button {
   width: 150px;
+}
+#selectedRunner div {
+  width: 150px;
+  height: 25px;
+  padding: 0px 25px;
+}
+#selectedRunner div input {
+  margin-left: 22px;
+  width: 138px;
+  height: 25px;
+  padding: 0px 5px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.3);
+  border: solid 1px black;
+  color: white;
 }
 .excluded {
   color: #616161 !important;
